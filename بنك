@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التحويلات الآمن</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+            direction: rtl;
+            text-align: right;
+        }
+
+        .financial-system-container {
+            width: 100%;
+            max-width: 800px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .auth-card, .transfer-card, .transactions-history-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+        .auth-card:hover, .transfer-card:hover, .transactions-history-card:hover {
+            box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+        }
+
+        h3 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+        }
+        h3 i {
+            margin-left: 10px;
+            color: #007bff;
+        }
+
+        .input-group, .form-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label, .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .input-group input, .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+        .input-group input:focus, .form-group input:focus, .form-group select:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 17px;
+            font-weight: bold;
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-bottom: 10px; /* لترك مسافة بين الأزرار */
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 14px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 17px;
+            font-weight: bold;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background 0.3s ease;
+        }
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .dashboard-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 28px;
+        }
+        .dashboard-header h2 span {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .transactions-history-card {
+            margin-top: 30px;
+        }
+
+        #transactionsList {
+            margin-top: 20px;
+        }
+
+        .transaction-item {
+            background: #f9f9f9;
+            padding: 18px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border-right: 5px solid #28a745; /* Changed to right for RTL */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            line-height: 1.8;
+            font-size: 15px;
+        }
+        .transaction-item p {
+            margin: 0;
+        }
+        .transaction-item strong {
+            color: #007bff;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            display: none; /* Controlled by JS */
+            line-height: 1.5;
+        }
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .message.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        a.switch-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+        a.switch-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="financial-system-container">
+    <div id="authSection">
+        <div id="loginScreen" class="auth-card">
+            <h3><i class="fas fa-lock"></i> تسجيل الدخول</h3>
+            <div class="input-group">
+                <label for="loginEmail">البريد الإلكتروني:</label>
+                <input type="email" id="loginEmail" placeholder="example@domain.com" required>
+            </div>
+            <div class="input-group">
+                <label for="loginPassword">كلمة السر:</label>
+                <input type="password" id="loginPassword" placeholder="********" required>
+            </div>
+            <button onclick="handleLogin()" class="btn-primary">تسجيل الدخول</button>
+            <button onclick="showScreen('requestVerificationScreen')" class="btn-secondary">تسجيل الدخول برابط سحري / رمز تحقق</button>
+            <div id="loginMessage" class="message"></div>
+            <a href="#" onclick="showScreen('registerScreen'); return false;" class="switch-link">ليس لديك حساب؟ إنشاء حساب جديد</a>
+        </div>
+
+        <div id="registerScreen" class="auth-card" style="display:none;">
+            <h3><i class="fas fa-user-plus"></i> إنشاء حساب جديد</h3>
+            <div class="input-group">
+                <label for="registerEmail">البريد الإلكتروني:</label>
+                <input type="email" id="registerEmail" placeholder="example@domain.com" required>
+            </div>
+            <div class="input-group">
+                <label for="registerPassword">كلمة السر:</label>
+                <input type="password" id="registerPassword" placeholder="********" required>
+            </div>
+            <div class="input-group">
+                <label for="registerPhone">رقم الهاتف (اختياري):</label>
+                <input type="tel" id="registerPhone" placeholder="مثال: 01xxxxxxxxx">
+            </div>
+            <button onclick="handleRegister()" class="btn-primary">تسجيل</button>
+            <div id="registerMessage" class="message"></div>
+            <a href="#" onclick="showScreen('loginScreen'); return false;" class="switch-link">لديك حساب بالفعل؟ تسجيل الدخول</a>
+        </div>
+
+        <div id="requestVerificationScreen" class="auth-card" style="display:none;">
+            <h3><i class="fas fa-magic"></i> تسجيل الدخول برابط سحري / رمز تحقق</h3>
+            <p>أدخل بريدك الإلكتروني ليرسل لك رمز تحقق أو رابط تسجيل دخول سحري.</p>
+            <div class="input-group">
+                <label for="verificationEmail">البريد الإلكتروني:</label>
+                <input type="email" id="verificationEmail" placeholder="example@domain.com" required>
+            </div>
+            <button onclick="requestVerificationCode()" class="btn-primary">إرسال رابط / رمز</button>
+            <div id="requestVerificationMessage" class="message"></div>
+            <a href="#" onclick="showScreen('loginScreen'); return false;" class="switch-link">العودة لتسجيل الدخول بكلمة السر</a>
+            <hr style="margin: 20px 0; border-top: 1px solid #eee;">
+            <h4>التحقق من الرمز</h4>
+            <div class="input-group">
+                <label for="verifyCodeInput">أدخل رمز التحقق:</label>
+                <input type="text" id="verifyCodeInput" placeholder="أدخل الرمز المكون من 6 أحرف" required>
+            </div>
+            <button onclick="verifyCode()" class="btn-primary">التحقق وتسجيل الدخول</button>
+            <div id="verifyCodeMessage" class="message"></div>
+        </div>
+
+    </div>
+
+    <div id="dashboard" style="display:none">
+        <div class="dashboard-header">
+            <h2>مرحباً، <span id="userEmail"></span></h2>
+            <button onclick="handleLogout()" class="btn-logout">تسجيل الخروج</button>
+        </div>
+
+        <div class="transfer-card">
+            <h3><i class="fas fa-exchange-alt"></i> تحويل أموال</h3>
+            <form id="transferForm">
+                <div class="form-group">
+                    <label for="recipient">رقم المستلم (رقم هاتف):</label>
+                    <input type="text" id="recipient" placeholder="مثال: 01xxxxxxxxx" required pattern="01[0-9]{9}">
+                </div>
+                <div class="form-group">
+                    <label for="amount">المبلغ بالجنيه المصري:</label>
+                    <input type="number" id="amount" placeholder="الحد الأدنى 10" min="10" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="method">طريقة التحويل:</label>
+                    <select id="method" required>
+                        <option value="">اختر طريقة...</option>
+                        <option value="vodafone">Vodafone Cash</option>
+                        <option value="orange">Orange Money</option>
+                        <option value="etisalat">Etisalat Cash</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">تنفيذ التحويل</button>
+            </form>
+            <div id="transferResult" class="message"></div>
+        </div>
+
+        <div class="transactions-history-card">
+            <h3><i class="fas fa-history"></i> سجل التحويلات</h3>
+            <div id="transactionsList"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+// IMPORTANT: Replace with your Google Apps Script Web App URL
+// هذا الرابط ستحصل عليه بعد نشر Google Apps Script كتطبيق ويب جديد
+const API_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE"; // <-- استبدل هذا
+
+let currentUser = null; // لتخزين بيانات المستخدم الذي قام بتسجيل الدخول
+let sessionToken = null; // لتخزين التوكن الخاص بالجلسة
+
+// --------------------------- وظائف المساعدة العامة ---------------------------
+
+/**
+ * تبديل الشاشات المرئية.
+ * @param {string} screenId - معرف الشاشة المراد عرضها ('loginScreen', 'registerScreen', 'requestVerificationScreen', 'dashboard').
+ */
+function showScreen(screenId) {
+    const screens = ['loginScreen', 'registerScreen', 'requestVerificationScreen', 'dashboard'];
+    screens.forEach(id => {
+        const screenElement = document.getElementById(id);
+        if (screenElement) { // تأكد من وجود العنصر قبل محاولة إظهاره/إخفائه
+            screenElement.style.display = (id === screenId) ? 'block' : 'none';
+        }
+    });
+}
+
+/**
+ * تعرض رسالة للمستخدم (نجاح أو خطأ).
+ * @param {string} elementId - معرف العنصر الذي ستعرض فيه الرسالة.
+ * @param {string} messageText - نص الرسالة.
+ * @param {'success' | 'error' | 'info'} type - نوع الرسالة.
+ */
+function showMessage(elementId, messageText, type) {
+    const element = document.getElementById(elementId);
+    if (!element) return; // تأكد أن العنصر موجود
+    element.textContent = messageText;
+    element.className = `message ${type}`;
+    element.style.display = 'block';
+    setTimeout(() => {
+        element.style.display = 'none';
+        element.textContent = '';
+    }, 8000); // إظهار الرسالة لمدة 8 ثوانٍ
+}
+
+/**
+ * عرض لوحة التحكم بعد تسجيل الدخول.
+ * @param {string} email - البريد الإلكتروني للمستخدم.
+ */
+function showDashboard(email) {
+    document.getElementById('authSection').style.display = 'none'; // إخفاء قسم المصادقة بالكامل
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('userEmail').textContent = email;
+    loadTransactions(); // تحميل التحويلات فور الدخول
+}
+
+/**
+ * الحصول على عنوان IP الخاص بالمستخدم.
+ * @returns {Promise<string>} IP Address.
+ */
+async function getIP() {
+    try {
+        const response = await axios.get('https://api.ipify.org?format=json');
+        return response.data.ip;
+    } catch (error) {
+        console.error("Error getting IP address:", error);
+        return 'unknown';
+    }
+}
+
+// --------------------------- وظائف المصادقة والتسجيل ---------------------------
+
+/**
+ * التعامل مع تسجيل المستخدمين الجدد.
+ */
+async function handleRegister() {
+    const email = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const phoneNumber = document.getElementById('registerPhone').value.trim(); // يمكن أن يكون فارغاً
+
+    if (!email || !password) {
+        showMessage('registerMessage', 'الرجاء إدخال البريد الإلكتروني وكلمة السر.', 'error');
+        return;
+    }
+    if (password.length < 6) {
+        showMessage('registerMessage', 'كلمة السر يجب أن تكون 6 أحرف على الأقل.', 'error');
+        return;
+    }
+
+    showMessage('registerMessage', 'جاري إنشاء حسابك وإرسال رمز التحقق...', 'info');
+
+    try {
+        const ip = await getIP();
+        const response = await axios.post(API_URL, new URLSearchParams({
+            action: 'register',
+            email: email,
+            password: password,
+            phoneNumber: phoneNumber,
+            ip: ip
+        }).toString(), {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+
+        if (response.data.status === 'success') {
+            showMessage('registerMessage', response.data.message, 'success');
+            // يمكن توجيه المستخدم مباشرة إلى شاشة طلب رمز التحقق
+            document.getElementById('verificationEmail').value = email; // ملء حقل الإيميل
+            showScreen('requestVerificationScreen');
+        } else {
+            showMessage('registerMessage', response.data.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error during registration:', error);
+        showMessage('registerMessage', 'حدث خطأ غير متوقع أثناء التسجيل. الرجاء المحاولة لاحقًا.', 'error');
+    }
+}
+
+/**
+ * طلب رمز تحقق جديد أو رابط سحري.
+ */
+async function requestVerificationCode() {
+    const email = document.getElementById('verificationEmail').value.trim();
+    if (!email) {
+        showMessage('requestVerificationMessage', 'الرجاء إدخال البريد الإلكتروني.', 'error');
+        return;
+    }
+
+    showMessage('requestVerificationMessage', 'جاري إرسال رابط / رمز التحقق...', 'info');
+
+    try {
+        const response = await axios.post(API_URL, new URLSearchParams({
+            action: 'requestVerificationCode',
+            email: email
+        }).toString(), {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+
+        if (response.data.status === 'success') {
+            showMessage('requestVerificationMessage', response.data.message, 'success');
+        } else {
+            showMessage('requestVerificationMessage', response.data.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error requesting verification code:', error);
+        showMessage('requestVerificationMessage', 'حدث خطأ أثناء طلب رمز التحقق. الرجاء المحاولة لاحقًا.', 'error');
+    }
+}
+
+/**
+ * التحقق من الرمز المدخل من قبل المستخدم.
+ */
+async function verifyCode() {
+    const email = document.getElementById('verificationEmail').value.trim();
+    const code = document.getElementById('verifyCodeInput').value.trim();
+
+    if (!email || !code) {
+        showMessage('verifyCodeMessage', 'الرجاء إدخال البريد الإلكتروني ورمز التحقق.', 'error');
+        return;
+    }
+
+    showMessage('verifyCodeMessage', 'جاري التحقق من الرمز وتسجيل الدخول...', 'info');
+
+    try {
+        const ip = await getIP();
+        const response = await axios.post(API_URL, new URLSearchParams({
+            action: 'verifyCode',
+            email: email,
+            code: code,
+            ip: ip
+        }).toString(), {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+
+        if (response.data.status === 'success') {
+            showMessage('verifyCodeMessage', response.data.message, 'success');
+            currentUser = response.data.user;
+            sessionToken = response.data.sessionToken;
+            sessionStorage.setItem('financial_token', sessionToken);
+            sessionStorage.setItem('user_email', currentUser.email);
+            showDashboard(currentUser.email);
+        } else {
+            showMessage('verifyCodeMessage', response.data.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error verifying code:', error);
+        showMessage('verifyCodeMessage', 'حدث خطأ غير متوقع أثناء التحقق. الرجاء المحاولة لاحقًا.', 'error');
+    }
+}
+
+/**
+ * التعامل مع تسجيل الدخول التقليدي (بالبريد وكلمة السر).
+ */
+async function handleLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+        showMessage('loginMessage', 'الرجاء إدخال البريد الإلكتروني وكلمة السر.', 'error');
+        return;
+    }
+
+    showMessage('loginMessage', 'جاري تسجيل الدخول...', 'info');
+
+    try {
+        const ip = await getIP();
+        const response = await axios.post(API_URL, new URLSearchParams({
+            action: 'login',
+            email: email,
+            password: password,
+            ip: ip
+        }).toString(), {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+
+        if (response.data.status === 'success') {
+            showMessage('loginMessage', response.data.message, 'success');
+            currentUser = response.data.user;
+            sessionToken = response.data.sessionToken;
+            sessionStorage.setItem('financial_token', sessionToken);
+            sessionStorage.setItem('user_email', currentUser.email);
+            showDashboard(currentUser.email);
+        } else if (response.data.needsVerification) {
+            showMessage('loginMessage', response.data.message, 'info');
+            document.getElementById('verificationEmail').value = email;
+            showScreen('requestVerificationScreen'); // توجيه لصفحة التحقق
+        }
+        else {
+            showMessage('loginMessage', response.data.message, 'error');
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        showMessage('loginMessage', 'حدث خطأ غير متوقع أثناء تسجيل الدخول. الرجاء المحاولة لاحقًا.', 'error');
+    }
+}
+
+/**
+ * ا
